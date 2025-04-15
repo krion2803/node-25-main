@@ -116,6 +116,28 @@ const totalResume = async(req,res)=>{
     }
 }
 
+const getResumesByUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const resumes = await resumeModel.find({ userId })
+      .populate("templateId")
+      .populate("userFormId");
+
+    if (!resumes || resumes.length === 0) {
+      return res.status(404).json({ message: "No resumes found for this user." });
+    }
+
+    res.json({
+      message: "Resumes fetched successfully",
+      data: resumes,
+    });
+  } catch (error) {
+    console.error("Error fetching resumes:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
 const getTemplateUsageStats = async (req, res) => {
     try {
       const data = await resumeModel.aggregate([
@@ -155,4 +177,4 @@ const getTemplateUsageStats = async (req, res) => {
     }
   };
 
-module.exports ={addResume,getIdByResume,deleteResume,totalResume , getTemplateUsageStats}
+module.exports ={addResume,getIdByResume,deleteResume,totalResume , getTemplateUsageStats , getResumesByUser}
